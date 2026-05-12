@@ -1,0 +1,131 @@
+body {
+    /* Base styles */
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #f0f0f0;
+    transition: background 0.5s ease;
+}
+
+/* Dynamic Backgrounds */
+.bg-default {
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+}
+
+/* Midnight Aurora */
+.bg-sunny {
+    background: linear-gradient(135deg, #2980b9, #6dd5fa, #ffffff);
+    color: #333;
+}
+
+/* Bright Blue/White */
+.bg-night {
+    background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+}
+
+/* Deep Night */
+.bg-cloudy {
+    background: linear-gradient(135deg, #606c88, #3f4c6b);
+}
+
+/* Greyish Blue */
+.bg-rainy {
+    background: linear-gradient(to bottom, #3a6073, #16222a);
+}
+
+/* Dark Grey/Blue */
+.bg-stormy {
+    background: linear-gradient(to bottom, #141e30, #243b55);
+}
+
+/* Very Dark Blue */
+.bg-snowy {
+    background: linear-gradient(135deg, #E0EAFC, #CFDEF3);
+    color: #333;
+}
+
+/* Light Blue/White */
+
+/* Text overrides for light backgrounds */
+.bg-sunny .text-white,
+.bg-snowy .text-white {
+    color: #333 !important;
+}
+
+.bg-sunny .glass-card,
+.bg-snowy .glass-card {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+
+/* Dynamic background based on time/weather could be added later using JS */
+
+.main-container {
+    min-height: 100vh;
+    background-color: transparent;
+    /* Let body gradient show through */
+    padding-bottom: 2rem;
+}
+
+/* Glassmorphism - Adjusted for Dark Mode */
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    /* Lower opacity for dark mode */
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    /* Stronger shadow */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Thinner/fainter border */
+}
+
+.glass-input {
+    background: rgba(0, 0, 0, 0.2) !important;
+    /* Darker input background */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+}
+
+.glass-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.glass-input:focus {
+    background: rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.glass-list .list-group-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-list .list-group-item:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    /* Subtle border */
+}
+
+/* Scrollbar styling - Dark themed */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}

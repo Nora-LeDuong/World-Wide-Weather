@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container pt-5 mt-4">
+    <div class="row">
+        <!-- Sidebar: Search & History -->
+        <div class="col-md-4 mb-4">
+            <div class="card glass-card p-4">
+                <h4 class="mb-3 text-white">{{ t.search_title }}</h4>
+                <form action="/" method="POST" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" name="city" class="form-control glass-input" id="search-input"
+                            placeholder="{{ t.search_placeholder }}" required>
+                        <button class="btn btn-light" type="submit"><i class="fas fa-search"></i></button>
+                    </div>
+                </form>
+
+                <h5 class="text-white mt-4"><i class="fas fa-history me-2"></i>{{ t.search_history }}</h5>
+                <div class="list-group list-group-flush glass-list" id="history-list">
+                    {% if history %}
+                    {% for item in history %}
+                    <a href="{{ url_for('index', city=item.city_name) }}"
+                        class="list-group-item list-group-item-action text-white bg-transparent border-0 ps-0 history-item">
+                        <i class="fas fa-clock me-2 text-white-50"></i><span class="history-city">{{ item.city_name
+                            }}</span>
+                    </a>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-white-50">{{ t.no_history }}</p>
+                    {% endif %}
+                    {% if history %}
+                    <a href="{{ url_for('clear_history') }}" class="btn btn-sm btn-outline-danger mt-2 w-100">{{
+                        t.clear_history }}</a>
+                    {% endif %}
+                </div>
+
+                <h5 class="text-white mt-4"><i class="fas fa-star me-2"></i>{{ t.favorites }}</h5>
+                <div class="list-group list-group-flush glass-list">
+                    {% if favorites %}
+                    {% for fav in favorites %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <a href="{{ url_for('index', city=fav.city_name) }}" class="text-white text-decoration-none">
+                            {{ fav.city_name }}
+                        </a>
+                        <a href="{{ url_for('remove_favorite', fav_id=fav.id) }}" class="text-danger"><i
+                                class="fas fa-trash-alt"></i></a>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-white-50">{{ t.no_favorites }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content: Weather Display -->
+        <div class="col-md-8">
+            {% if weather %}
+            {% if weather.error %}
+            <div class="alert alert-danger">{{ weather.error }}</div>
+            {% else %}
+            <!-- Current Weather -->
+            <div class="card glass-card p-4 mb-4 text-white">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h2 class="display-4 fw-bold" id="current-city">
+                            <img src="https://flagcdn.com/48x36/{{ weather.current.country_code_lower }}.png"
+                                alt="{{ weather.current.country }}" class="me-2"
+                                style="height: 0.8em; vertical-align: baseline; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                            {{ weather.current.city }}, {{ weather.current.country }}
+                        </h2>
+                        <p class="lead" id="current-date">{{ weather.current.dt.strftime('%A, %d %B %Y') }}</p>
+                    </div>
+                    <div class="text-end">
+                        <form action="{{ url_for('add_favorite') }}" method="POST" class="d-inline">
+                            <input type="hidden" name="city" value="{{ weather.current.city }}">
+                            <button type="submit" class="btn btn-outline-light btn-sm rounded-circle"
+                                title="Thêm vào yêu thích">
+                                <i class="fas fa-star"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row align-items-center mt-3">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="d-flex align-items-center justify-content-center justify-content-md-start">
+                            <img id="current-icon"
+                                src="http://openweathermap.org/img/wn/{{ weather.current.icon }}@4x.png" alt="icon"
+                                style="filter: drop-shadow(2px 4px 6px black);">
+                            <div>
+                                <h1 class="display-1 fw-bold"><span id="current-temp">{{ weather.current.temp }}</span>°
+                                </h1>
+                                <h4 class="text-capitalize" id="current-desc">{{ weather.current.description }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- AQI Prominent Box -->
+                        {% if weather.current.aqi %}
+                        <div class="p-3 mb-3 glass-panel rounded d-flex align-items-center justify-content-between
+                            {% if weather.current.aqi == 1 %}border-success border-2
+                            {% elif weather.current.aqi == 2 %}border-warning border-2
+                            {% elif weather.current.aqi == 3 %}border-warning border-2
+                            {% elif weather.current.aqi == 4 %}border-danger border-2
+                            {% else %}border-dark border-2{% endif %}" style="border-style: solid;">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-lungs fa-2x me-3 
+                                {% if weather.current.aqi == 1 %}text-success
+                                {% elif weather.current.aqi == 2 %}text-warning
+                                {% elif weather.current.aqi == 3 %}text-warning
+                                {% elif weather.current.aqi == 4 %}text-danger
+                                {% else %}text-dark{% endif %}"></i>
+                                <div>
+                                    <h5 class="mb-0 fw-bold">{{ t.air_quality }}</h5>
+                                    <small class="text-white-50">{{ t.aqi_index }}</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <h2 class="mb-0 fw-bold 
+                                {% if weather.current.aqi == 1 %}text-success
+                                {% elif weather.current.aqi == 2 %}text-warning
+                                {% elif weather.current.aqi == 3 %}text-warning
+                                {% elif weather.current.aqi == 4 %}text-danger
+                                {% else %}text-dark{% endif %}">{{ weather.current.aqi }}</h2>
+                                <span class="badge 
+                                {% if weather.current.aqi == 1 %}bg-success
+                                {% elif weather.current.aqi == 2 %}bg-warning text-dark
+                                {% elif weather.current.aqi == 3 %}bg-warning
+                                {% elif weather.current.aqi == 4 %}bg-danger
+                                {% else %}bg-dark{% endif %}">
+                                    {% if weather.current.aqi == 1 %}{{ t.aqi_good }}
+                                    {% elif weather.current.aqi == 2 %}{{ t.aqi_fair }}
+                                    {% elif weather.current.aqi == 3 %}{{ t.aqi_moderate }}
+                                    {% elif weather.current.aqi == 4 %}{{ t.aqi_poor }}
+                                    {% else %}{{ t.aqi_very_poor }}{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Main Metrics Grid -->
+                        <div class="row g-2">
+                            <div class="col-6 col-sm-4">
+                                <div class="p-2 glass-panel rounded text-center h-100">
+                                    <i class="fas fa-umbrella fa-lg mb-1"></i>
+                                    <p class="mb-0 small">{{ t.rain }}</p>
+                                    <h6 class="fw-bold"><span id="current-rain-prob">{{ weather.current.rain_prob
+                                            }}</span>%</h6>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-4">
+                                <div class="p-2 glass-panel rounded text-center h-100">
+                                    <i class="fas fa-tint fa-lg mb-1"></i>
+                                    <p class="mb-0 small">{{ t.humidity }}</p>
+                                    <h6 class="fw-bold"><span id="current-humidity">{{ weather.current.humidity
+                                            }}</span>%</h6>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-4">
+                                <div class="p-2 glass-panel rounded text-center h-100">
+                                    <i class="fas fa-wind fa-lg mb-1"></i>
+                                    <p class="mb-0 small">{{ t.wind }}</p>
+                                    <h6 class="fw-bold"><span id="current-wind">{{ weather.current.wind_speed }}</span>
+                                        m/s</h6>
+                                </div>
+                            </div>
+                            <!-- Extra Details -->
+                            <div class="col-6 col-sm-4">
+                                <div class="p-2 glass-panel rounded text-center h-100">
+                                    <i class="fas fa-eye fa-lg mb-1"></i>
+                                    <p class="mb-0 small">{{ t.visibility }}</p>
+                                    <h6 class="fw-bold"><span id="current-visibility">{{ weather.current.visibility
+                                            }}</span> km</h6>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-4">
+                                <div class="p-2 glass-panel rounded text-center h-100">
+                                    <i class="fas fa-compress-arrows-alt fa-lg mb-1"></i>
+                                    <p class="mb-0 small">{{ t.pressure }}</p>
+                                    <h6 class="fw-bold"><span id="current-pressure">{{ weather.current.pressure
+                                            }}</span> hPa</h6>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-4">
+                                <div class="p-2 glass-panel rounded text-center h-100">
+                                    <i class="fas fa-sun fa-lg mb-1 text-warning"></i>
+                                    <p class="mb-0 small">{{ t.sun_cycle }}</p>
+                                    <h6 class="fw-bold small">{{ weather.current.sunrise }} / {{ weather.current.sunset
+                                        }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hourly Forecast Scroller (NEW) -->
+            {% if weather.hourly %}
+            <h4 class="text-white mb-3">{{ t.forecast_24h }}</h4>
+            <div class="glass-card p-3 mb-4 overflow-auto">
+                <div class="d-flex flex-nowrap gap-3" id="hourly-forecast-container">
+                    {% for hour in weather.hourly %}
+                    <div class="text-center text-white" style="min-width: 80px;">
+                        <p class="mb-0 small opacity-75">{{ hour.time }}</p>
+                        <img src="http://openweathermap.org/img/wn/{{ hour.icon }}.png" width="40" alt="icon">
+                        <h6 class="mb-0">{{ hour.temp }}°</h6>
+                        <small class="text-info" style="font-size: 0.7rem;"><i class="fas fa-umbrella"></i> {{
+                            hour.rain_prob }}%</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Charts -->
+            <div class="card glass-card p-4 mb-4">
+                <h4 class="text-white mb-3">{{ t.forecast_chart }}</h4>
+                <div style="position: relative; height:30vh; width:100%">
+                    <canvas id="weatherChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 7 Day Forecast Cards -->
+            <h4 class="text-white mb-3">{{ t.forecast_5d }}</h4>
+            <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-2">
+                {% for day in weather.forecast %}
+                <div class="col">
+                    <div class="card glass-card p-2 text-center text-white h-100 forecast-card"
+                        onclick="showDayDetails('{{ loop.index0 }}')"
+                        style="cursor: pointer; transition: transform 0.2s;">
+                        <p class="mb-1 fw-bold small">{{ day.date }}</p>
+                        <img src="http://openweathermap.org/img/wn/{{ day.icon }}.png" class="mx-auto d-block"
+                            alt="icon" width="50">
+                        <h6 class="mb-1">{{ day.temp }}°C</h6>
+                        <small class="text-white-50 d-block text-truncate" style="font-size: 0.7rem;">
+                            {{ day.description }}
+                        </small>
+                        <div class="mt-1 text-info small">
+                            <i class="fas fa-umbrella"></i> {{ day.rain_prob }}%
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pass data to JS -->
+            <script id="forecast-data-json" type="application/json">
+                {{ weather.forecast | tojson }}
+            </script>
+            <script>
+                const forecastData = JSON.parse(document.getElementById('forecast-data-json').textContent);
+            </script>
+            {% endif %}
+            {% else %}
+            <div class="text-center text-white mt-5 pt-5">
+                <i class="fas fa-cloud-sun fa-10x mb-4 text-white-50"></i>
+                <h2 class="fw-bold">{{ t.welcome_title if t else "Welcome to World Wide Weather" }}</h2>
+                <p class="lead">{{ t.welcome_msg if t else "Enter a city name to view the weather forecast." }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
